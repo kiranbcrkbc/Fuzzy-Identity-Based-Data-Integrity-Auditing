@@ -109,7 +109,37 @@ The application opens automatically at: **`http://localhost:8080/Fuzzy_IDbased_D
 
 ---
 
-## 6. Docker Containerized Deployment
+## 6. Vercel Serverless Cloud Deployment (`.vercel.app`)
+
+The repository includes a modern, Vercel-native full-stack serverless architecture in the root directory:
+- **Serverless API Handlers (`api/`):** Node.js serverless functions handling authentication, AES-128 cryptographic operations, KGC private key generation, TPA auditing challenges, and deterministic cloud proof verification.
+- **Frontend Presentation Layer (`public/`):** Responsive Cyberpunk Glassmorphism UI for all 4 operational entities (`index.html`, `user.html`, `kgc.html`, `tpa.html`, `cloud.html`).
+- **Database Connectivity:** Supports managed MySQL databases via environment variables (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`), with an automated serverless persistent fallback engine when deployed directly without external DB configuration.
+
+### One-Click Vercel Deployment Instructions:
+1. Navigate to **[Vercel Dashboard &rarr; Add New Project](https://vercel.com/new)**.
+2. Select your connected GitHub account (**`kiranbcrkbc`**) and import repository:
+   **`kiranbcrkbc/Fuzzy-Identity-Based-Data-Integrity-Auditing`**
+3. Keep default settings (Framework: *Other*, Root Directory: `./`).
+4. *(Optional)* Add production MySQL credentials under **Environment Variables** (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`).
+5. Click **Deploy** &mdash; Vercel builds and deploys the live application in under 30 seconds to:
+   **`https://fuzzy-identity-based-data-integrity-auditing.vercel.app`**
+
+### Running the Vercel Application Locally:
+```bash
+npm install
+npm start
+# Opens at: http://localhost:3000/
+```
+
+### Running Automated Vercel Pipeline Tests (20 Stages):
+```powershell
+powershell -File tools/test_vercel_full_pipeline.ps1
+```
+
+---
+
+## 7. Docker Containerized Deployment
 
 Deploy with a single command on any machine with Docker installed:
 ```bash

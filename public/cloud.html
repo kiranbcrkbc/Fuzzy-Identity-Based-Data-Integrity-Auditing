@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Storage Server | Fuzzy Auditing</title>
+  <link rel="stylesheet" href="css/cyber_theme.css">
+</head>
+<body>
+
+  <!-- Top Cyber Navbar -->
+  <nav class="cyber-navbar">
+    <div class="app-container nav-wrapper">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #a855f7, #6b21a8);">C</div>
+        <div class="brand-text">
+          <h1>CLOUD STORAGE SERVER (CSS)</h1>
+          <p>Remote Repository & Proof Engine</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Overview</a></li>
+        <li><a href="/user">User Portal</a></li>
+        <li><a href="/kgc">KGC Portal</a></li>
+        <li><a href="/tpa">TPA Portal</a></li>
+        <li class="active"><a href="/cloud">Cloud Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="app-container hero-section">
+    <div style="max-width: 960px; margin: 20px auto;">
+
+      <!-- Alert Banner -->
+      <div id="cloud-alert"></div>
+
+      <!-- Cloud Login Card -->
+      <div id="cloud-login-card" class="cyber-card" style="max-width: 440px; margin: 40px auto;">
+        <div class="card-header">
+          <h3>&#9729; Cloud Storage Server Login</h3>
+          <span class="role-badge cloud">Cloud Host</span>
+        </div>
+        <div class="card-body">
+          <form onsubmit="handleCloudLogin(event)">
+            <div class="form-group">
+              <label>Cloud Server ID</label>
+              <input type="text" id="cloud-user" class="form-control" value="cloud" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="cloud-pass" class="form-control" value="cloud" required>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn btn-cyber" style="width: 100%; background: linear-gradient(135deg, #a855f7, #6b21a8); color: #fff;">
+                Access Cloud Storage Engine &rarr;
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cloud Dashboard -->
+      <div id="cloud-dashboard" style="display: none;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 24px; color: #f8fafc;">Cloud Auditing Challenge Response Engine</h2>
+            <p style="font-size: 13px; color: var(--text-secondary);">Process TPA auditing challenges and compute deterministic algebraic proofs over ciphertext blocks.</p>
+          </div>
+          <button onclick="logoutCloud()" class="btn btn-outline" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Logout</button>
+        </div>
+
+        <div class="cyber-card">
+          <div class="card-header">
+            <h3>&#9881; Incoming TPA Auditing Challenges</h3>
+            <button onclick="loadCloudChallenges()" class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;">&#8635; Refresh</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Challenge ID</th>
+                    <th>File Key</th>
+                    <th>Owner UID</th>
+                    <th>Challenge Time</th>
+                    <th>Status</th>
+                    <th>Proof Action</th>
+                  </tr>
+                </thead>
+                <tbody id="cloud-challenges-body">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No challenges received from TPA yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="cyber-footer">
+    <div class="app-container">
+      <p><strong>Department of Computer Science & Engineering</strong> &bull; R R Institute of Technology</p>
+    </div>
+  </footer>
+
+  <script>
+    function showCloudAlert(type, msg) {
+      document.getElementById('cloud-alert').innerHTML = `
+        <div class="alert-banner ${type}" style="margin-bottom: 20px;">
+          <span>${type === 'success' ? '&#10004;' : '&#9888;'}</span>
+          <div>${msg}</div>
+        </div>`;
+    }
+
+    function handleCloudLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('cloud-user').value.trim();
+      const p = document.getElementById('cloud-pass').value.trim();
+      if ((u === 'cloud' && p === 'cloud') || (u === 'admin' && p === 'admin')) {
+        document.getElementById('cloud-login-card').style.display = 'none';
+        document.getElementById('cloud-dashboard').style.display = 'block';
+        showCloudAlert('success', 'Authenticated as Cloud Storage Server Host.');
+        loadCloudChallenges();
+      } else {
+        showCloudAlert('error', 'Invalid Cloud credentials.');
+      }
+    }
+
+    async function loadCloudChallenges() {
+      try {
+        const res = await fetch('/api/cloud');
+        const data = await res.json();
+        const tbody = document.getElementById('cloud-challenges-body');
+        if (data.success && data.requests && data.requests.length > 0) {
+          tbody.innerHTML = data.requests.map(c => `
+            <tr>
+              <td>#${c.id}</td>
+              <td><code style="color:var(--cyan-glow);">${c.filekey}</code></td>
+              <td>User #${c.uid}</td>
+              <td style="font-size:12px;color:var(--text-muted);">${c.time}</td>
+              <td><span class="role-badge ${c.status === 'Proof Generated' ? 'user' : 'cloud'}">${c.status}</span></td>
+              <td>
+                ${c.status === 'waiting' ? `
+                  <button onclick="generateProof('${c.filekey}', '${c.uid}')" class="btn btn-cyber" style="font-size:11px;padding:4px 8px;background:linear-gradient(135deg,#a855f7,#6b21a8);color:#fff;">
+                    &#9881; Generate Proof Hash
+                  </button>
+                ` : `
+                  <span style="color:var(--emerald-glow);font-size:12px;">&#10004; Proof Transmitted</span>
+                `}
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No challenges received from TPA yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function generateProof(filekey, uid) {
+      try {
+        const res = await fetch('/api/cloud?action=proof', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, uid })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showCloudAlert('success', `Cryptographic Proof Hash [${data.proofHash}] generated for file ${filekey}! Transmitted to TPA.`);
+          loadCloudChallenges();
+        } else {
+          showCloudAlert('error', data.message);
+        }
+      } catch (err) {
+        showCloudAlert('error', err.message);
+      }
+    }
+
+    function logoutCloud() {
+      document.getElementById('cloud-dashboard').style.display = 'none';
+      document.getElementById('cloud-login-card').style.display = 'block';
+      showCloudAlert('info', 'Logged out of Cloud Server.');
+    }
+  </script>
+
+</body>
+</html>

@@ -18,7 +18,8 @@
 | **End-to-End Business Pipeline** | 10 | 10 | 0 | **PASS** |
 | **Negative Security & Tampering Tests** | 7 | 7 | 0 | **PASS** |
 | **Live Public HTTPS End-to-End Test** | 7 | 7 | 0 | **PASS** |
-| **TOTAL** | **64** | **64** | **0** | **PASS (100%)** |
+| **Vercel Full-Stack Pipeline & Security** | 20 | 20 | 0 | **PASS** |
+| **TOTAL** | **84** | **84** | **0** | **PASS (100%)** |
 
 ---
 
@@ -121,6 +122,33 @@
 | E5 | Public User 2FA Login | OTP challenge and response over HTTPS | User authenticated | **PASS** |
 | E6 | Public File Upload | Encrypted upload with AES-128 over HTTPS | File key and hash persisted | **PASS** |
 | E7 | Public End-to-End Audit | Full challenge, proof computation, and verification over HTTPS | Proof matched original hash | **PASS** |
+
+---
+
+### Category F: Vercel Full-Stack Architecture Pipeline (`test_vercel_full_pipeline.ps1`)
+
+| # | Vercel Pipeline Stage | Target Route / Action | Actual Result | Result |
+| :-: | :--- | :--- | :--- | :-: |
+| F1 | Vercel Landing Page | `GET /` | HTTP 200 OK | **PASS** |
+| F2 | Vercel User Portal | `GET /user` | HTTP 200 OK | **PASS** |
+| F3 | Vercel KGC Portal | `GET /kgc` | HTTP 200 OK | **PASS** |
+| F4 | Vercel TPA Portal | `GET /tpa` | HTTP 200 OK | **PASS** |
+| F5 | Vercel Cloud Portal | `GET /cloud` | HTTP 200 OK | **PASS** |
+| F6 | Serverless Registration | `POST /api/auth?action=register` | User record inserted with pending KGC status | **PASS** |
+| F7 | Duplicate Registration Block | `POST /api/auth?action=register` | Duplicate email rejected with HTTP 409 Conflict | **PASS** |
+| F8 | Unapproved Login Block | `POST /api/auth?action=login` | Unapproved user blocked with HTTP 403 Forbidden | **PASS** |
+| F9 | KGC Identity Discovery | `GET /api/kgc?action=list` | User identified in KGC pending registry | **PASS** |
+| F10 | KGC Secret Key Generation | `POST /api/kgc?action=approve` | Cryptographic key `FUZZY...` generated and bound | **PASS** |
+| F11 | User Authentication | `POST /api/auth?action=login` | Credentials verified; 2FA OTP issued | **PASS** |
+| F12 | Invalid OTP Rejection | `POST /api/auth?action=otp` | Wrong OTP rejected with HTTP 401 Unauthorized | **PASS** |
+| F13 | Valid 2FA Verification | `POST /api/auth?action=otp` | Matching OTP unlocks user session | **PASS** |
+| F14 | AES-128 Document Upload | `POST /api/files` | File encrypted with AES-128; SHA hash persisted | **PASS** |
+| F15 | Repository File Listing | `GET /api/files?uid=...` | Stored ciphertext and hash returned | **PASS** |
+| F16 | Audit Request Initiation | `POST /api/audit?action=request` | Audit challenge queued for TPA | **PASS** |
+| F17 | TPA Challenge to Cloud | `POST /api/tpa?action=challenge` | Challenge transmitted to Cloud Storage Server | **PASS** |
+| F18 | Cloud Proof Computation | `POST /api/cloud?action=proof` | Deterministic proof computed and persisted | **PASS** |
+| F19 | Positive Proof Verification | `POST /api/tpa?action=verify` | TPA confirms proof matches original hash (100% Match) | **PASS** |
+| F20 | Deliberate Tampering Detection | `POST /api/tamper?action=corrupt` | TPA detects hash corruption & flags INTEGRITY BREACH | **PASS** |
 
 ---
 

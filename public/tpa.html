@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Third Party Auditor (TPA) Suite | Fuzzy Auditing</title>
+  <link rel="stylesheet" href="css/cyber_theme.css">
+</head>
+<body>
+
+  <!-- Top Cyber Navbar -->
+  <nav class="cyber-navbar">
+    <div class="app-container nav-wrapper">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon" style="background: linear-gradient(135deg, var(--amber-primary), #d97706);">T</div>
+        <div class="brand-text">
+          <h1>THIRD PARTY AUDITOR (TPA)</h1>
+          <p>Zero-Knowledge Integrity Verification</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Overview</a></li>
+        <li><a href="/user">User Portal</a></li>
+        <li><a href="/kgc">KGC Portal</a></li>
+        <li class="active"><a href="/tpa">TPA Portal</a></li>
+        <li><a href="/cloud">Cloud Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="app-container hero-section">
+    <div style="max-width: 980px; margin: 20px auto;">
+
+      <!-- Alert Banner -->
+      <div id="tpa-alert"></div>
+
+      <!-- TPA Login Card -->
+      <div id="tpa-login-card" class="cyber-card" style="max-width: 440px; margin: 40px auto;">
+        <div class="card-header">
+          <h3>&#128269; TPA Auditor Authentication</h3>
+          <span class="role-badge tpa">Public Auditor</span>
+        </div>
+        <div class="card-body">
+          <form onsubmit="handleTpaLogin(event)">
+            <div class="form-group">
+              <label>Auditor Username</label>
+              <input type="text" id="tpa-user" class="form-control" value="TPA" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="tpa-pass" class="form-control" value="TPA" required>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn btn-cyber" style="width: 100%; background: linear-gradient(135deg, var(--amber-primary), #d97706); color: #0b0f19;">
+                Enter Auditing Control Suite &rarr;
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TPA Dashboard -->
+      <div id="tpa-dashboard" style="display: none;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 24px; color: #f8fafc;">TPA Auditing & Verification Console</h2>
+            <p style="font-size: 13px; color: var(--text-secondary);">Independent third-party verification of remote cloud ciphertext integrity without data disclosure.</p>
+          </div>
+          <button onclick="logoutTpa()" class="btn btn-outline" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Logout</button>
+        </div>
+
+        <!-- LIVE TAMPERING & SECURITY BREACH SIMULATION CONTROL CARD -->
+        <div class="cyber-card" style="margin-bottom: 24px; border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(30, 27, 75, 0.4);">
+          <div class="card-header">
+            <h3 style="color: #f87171;">&#9888; Presentation Security Showcase: Deliberate Tampering Simulation</h3>
+            <span class="role-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #f87171;">Examiner Live Test</span>
+          </div>
+          <div class="card-body">
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Prove cryptographic integrity detection live! Deliberately tamper with the stored database hash to demonstrate TPA detecting cloud corruption, then restore clean state with 1 click.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <input type="text" id="tamper-filekey" class="form-control" placeholder="Enter File Key (e.g. file1234567)" style="max-width: 240px; font-family: var(--font-mono);">
+              <button onclick="triggerTamper('corrupt')" class="btn btn-cyber" style="background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff;">
+                &#128163; 1. Corrupt Hash (Simulate Tampering)
+              </button>
+              <button onclick="triggerTamper('restore')" class="btn btn-outline" style="border-color: var(--emerald-glow); color: var(--emerald-glow);">
+                &#9989; 2. Restore Clean Hash
+              </button>
+            </div>
+            <div id="tamper-status" style="margin-top: 12px;"></div>
+          </div>
+        </div>
+
+        <!-- 1. Pending Audit Requests Table -->
+        <div class="cyber-card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <h3>&#128233; User Audit Challenge Queue</h3>
+            <button onclick="loadTpaData()" class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;">&#8635; Refresh</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Audit ID</th>
+                    <th>File Key</th>
+                    <th>Owner UID</th>
+                    <th>Request Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tpa-requests-body">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No audit requests pending.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Computed Proofs Verification Table -->
+        <div class="cyber-card">
+          <div class="card-header">
+            <h3>&#9989; Cloud Cryptographic Proofs & Integrity Verification</h3>
+            <span class="role-badge user">Zero-Knowledge Verification</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Proof ID</th>
+                    <th>File Key</th>
+                    <th>Owner UID</th>
+                    <th>Cloud Proof Hash</th>
+                    <th>Verification</th>
+                  </tr>
+                </thead>
+                <tbody id="tpa-proofs-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No proofs computed by Cloud Server yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="cyber-footer">
+    <div class="app-container">
+      <p><strong>Department of Computer Science & Engineering</strong> &bull; R R Institute of Technology</p>
+    </div>
+  </footer>
+
+  <script>
+    function showTpaAlert(type, msg) {
+      document.getElementById('tpa-alert').innerHTML = `
+        <div class="alert-banner ${type}" style="margin-bottom: 20px;">
+          <span>${type === 'success' ? '&#10004;' : '&#9888;'}</span>
+          <div>${msg}</div>
+        </div>`;
+    }
+
+    function handleTpaLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('tpa-user').value.trim();
+      const p = document.getElementById('tpa-pass').value.trim();
+      if ((u === 'TPA' && p === 'TPA') || (u === 'tpa' && p === 'tpa')) {
+        document.getElementById('tpa-login-card').style.display = 'none';
+        document.getElementById('tpa-dashboard').style.display = 'block';
+        showTpaAlert('success', 'Authenticated as Third Party Auditor (TPA).');
+        loadTpaData();
+      } else {
+        showTpaAlert('error', 'Invalid TPA credentials.');
+      }
+    }
+
+    async function loadTpaData() {
+      try {
+        // Load Audit Requests
+        const reqRes = await fetch('/api/audit');
+        const reqData = await reqRes.json();
+        const reqBody = document.getElementById('tpa-requests-body');
+        if (reqData.success && reqData.requests && reqData.requests.length > 0) {
+          reqBody.innerHTML = reqData.requests.map(r => `
+            <tr>
+              <td>#${r.id}</td>
+              <td><code style="color:var(--cyan-glow);">${r.filekey}</code></td>
+              <td>User #${r.uid}</td>
+              <td style="font-size:12px;color:var(--text-muted);">${r.time}</td>
+              <td><span class="role-badge ${r.status === 'Proof Generated' ? 'user' : 'tpa'}">${r.status}</span></td>
+              <td>
+                ${r.status === 'waiting' ? `
+                  <button onclick="sendChallengeToCloud('${r.filekey}', '${r.uid}')" class="btn btn-cyber" style="font-size:11px;padding:4px 8px;background:linear-gradient(135deg,var(--amber-primary),#d97706);color:#0b0f19;">
+                    &#128640; Send Challenge to Cloud
+                  </button>
+                ` : `
+                  <span style="color:var(--emerald-glow);font-size:12px;">&#10004; Challenge Forwarded</span>
+                `}
+              </td>
+            </tr>
+          `).join('');
+
+          // Auto-fill file key for tamper tester
+          if (!document.getElementById('tamper-filekey').value && reqData.requests[0]) {
+            document.getElementById('tamper-filekey').value = reqData.requests[0].filekey;
+          }
+        } else {
+          reqBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No audit requests pending.</td></tr>';
+        }
+
+        // Load Computed Proofs
+        const proofRes = await fetch('/api/tpa?action=proofs');
+        const proofData = await proofRes.json();
+        const proofBody = document.getElementById('tpa-proofs-body');
+        if (proofData.success && proofData.proofs && proofData.proofs.length > 0) {
+          proofBody.innerHTML = proofData.proofs.map(p => `
+            <tr>
+              <td>#${p.id}</td>
+              <td><code style="color:var(--cyan-glow);">${p.filekey}</code></td>
+              <td>User #${p.uid}</td>
+              <td><code style="color:var(--emerald-glow);">${p.hashproof}</code></td>
+              <td>
+                <button onclick="verifyProof('${p.filekey}', '${p.hashproof}')" class="btn btn-cyber" style="font-size:11px;padding:4px 8px;background:linear-gradient(135deg,var(--emerald-glow),#059669);color:#0b0f19;">
+                  &#9989; Verify Cryptographic Proof
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          proofBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No proofs computed by Cloud Server yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function sendChallengeToCloud(filekey, uid) {
+      try {
+        const res = await fetch('/api/tpa?action=challenge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, uid })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showTpaAlert('success', `TPA Challenge for file ${filekey} sent to Cloud Storage Server!`);
+          loadTpaData();
+        } else {
+          showTpaAlert('error', data.message);
+        }
+      } catch (err) {
+        showTpaAlert('error', err.message);
+      }
+    }
+
+    let lastKnownCleanProof = null;
+
+    async function verifyProof(filekey, cloudProofHash) {
+      try {
+        lastKnownCleanProof = cloudProofHash;
+        const res = await fetch('/api/tpa?action=verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, cloudProofHash })
+        });
+        const data = await res.json();
+        if (data.verified) {
+          showTpaAlert('success', `<strong>${data.message}</strong><br>Original Hash: <code>${data.originalHash}</code> &bull; Cloud Proof: <code>${data.cloudProofHash}</code>`);
+        } else {
+          showTpaAlert('error', `<strong>${data.message}</strong><br>Original DB Hash: <code>${data.originalHash}</code> &bull; Cloud Proof: <code>${data.cloudProofHash}</code>`);
+        }
+      } catch (err) {
+        showTpaAlert('error', err.message);
+      }
+    }
+
+    async function triggerTamper(mode) {
+      const filekey = document.getElementById('tamper-filekey').value.trim();
+      const statusDiv = document.getElementById('tamper-status');
+      if (!filekey) {
+        alert('Please enter a File Key first.');
+        return;
+      }
+
+      if (mode === 'corrupt') {
+        const res = await fetch('/api/tamper?action=corrupt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, corruptedHash: 'TAMPERED_MALICIOUS_HASH_X99' })
+        });
+        const data = await res.json();
+        statusDiv.innerHTML = `<div class="alert-banner error" style="margin-top:10px;">
+          <span>&#9888;</span>
+          <div><strong>TAMPERING SIMULATED:</strong> File hash corrupted to <code>${data.corruptedHash}</code>. Now click 'Verify Cryptographic Proof' in the table below to see TPA detect the security breach!</div>
+        </div>`;
+      } else {
+        const res = await fetch('/api/tamper?action=restore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, originalHash: lastKnownCleanProof || '-1333929955' })
+        });
+        const data = await res.json();
+        statusDiv.innerHTML = `<div class="alert-banner success" style="margin-top:10px;">
+          <span>&#10004;</span>
+          <div><strong>CLEAN STATE RESTORED:</strong> Original hash restored. Proof verification will now succeed 100%!</div>
+        </div>`;
+      }
+    }
+
+    function logoutTpa() {
+      document.getElementById('tpa-dashboard').style.display = 'none';
+      document.getElementById('tpa-login-card').style.display = 'block';
+      showTpaAlert('info', 'Logged out of TPA Suite.');
+    }
+  </script>
+
+</body>
+</html>

@@ -10,6 +10,10 @@
 **/dist/
 **/WEB-INF/classes/
 
+# Node.js Dependencies
+node_modules/
+package-lock.json
+
 # NetBeans / IDE Project Artifacts
 **/nbproject/private/
 .idea/

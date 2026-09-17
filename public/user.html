@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Owner Portal | Fuzzy Auditing</title>
+  <link rel="stylesheet" href="css/cyber_theme.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="cyber-navbar">
+    <div class="app-container nav-wrapper">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">U</div>
+        <div class="brand-text">
+          <h1>DATA OWNER PORTAL</h1>
+          <p>Fuzzy Identity Auditing</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Overview</a></li>
+        <li class="active"><a href="/user">User Portal</a></li>
+        <li><a href="/kgc">KGC Portal</a></li>
+        <li><a href="/tpa">TPA Portal</a></li>
+        <li><a href="/cloud">Cloud Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="app-container hero-section">
+    <div style="max-width: 900px; margin: 20px auto;">
+
+      <!-- Global Alert Container -->
+      <div id="alert-box"></div>
+
+      <!-- VIEW 1: AUTHENTICATION / REGISTRATION CONTAINER -->
+      <div id="auth-view" style="display: block;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px;">
+
+          <!-- Login Form Card -->
+          <div class="cyber-card">
+            <div class="card-header">
+              <h3>&#128272; User Authentication</h3>
+              <span class="role-badge user">Login</span>
+            </div>
+            <div class="card-body">
+              <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                  <label for="login-email">Registered Email</label>
+                  <input type="email" id="login-email" class="form-control" placeholder="kiran@example.com" value="kiran@example.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="login-pass">Password</label>
+                  <input type="password" id="login-pass" class="form-control" placeholder="&bull;&bull;&bull;&bull;&bull;" value="123" required>
+                </div>
+                <div style="margin-top: 20px;">
+                  <button type="submit" class="btn btn-cyber" style="width: 100%;">Authenticate & Dispatch OTP &rarr;</button>
+                </div>
+              </form>
+
+              <!-- OTP Verification Modal / Block -->
+              <div id="otp-section" style="display: none; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+                <div class="alert-banner info" id="otp-hint-banner" style="margin-bottom: 12px;"></div>
+                <form id="otp-form" onsubmit="handleOtpVerify(event)">
+                  <div class="form-group">
+                    <label for="otp-code">Enter 6-Digit One-Time Password</label>
+                    <input type="text" id="otp-code" class="form-control" placeholder="e.g. I12345" required style="font-family: var(--font-mono); letter-spacing: 0.2em; font-size: 18px; text-align: center;">
+                  </div>
+                  <button type="submit" class="btn btn-cyber" style="width: 100%; background: linear-gradient(135deg, var(--cyan-glow), #0284c7);">Verify 2FA OTP & Open Dashboard</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registration Form Card -->
+          <div class="cyber-card">
+            <div class="card-header">
+              <h3>&#128221; New User Registration</h3>
+              <span class="role-badge user">Register</span>
+            </div>
+            <div class="card-body">
+              <form id="reg-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" id="reg-name" class="form-control" placeholder="Student Name" required>
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" id="reg-email" class="form-control" placeholder="student@example.com" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-pass" class="form-control" placeholder="Password" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="reg-phone" class="form-control" placeholder="9876543210" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Biometric Signature Simulation</label>
+                  <input type="file" id="reg-bio" class="form-control" accept="image/*">
+                  <small style="color: var(--text-muted); font-size: 11px;">Upload signature or ID card image (optional for quick testing).</small>
+                </div>
+                <div style="margin-top: 16px;">
+                  <button type="submit" class="btn btn-outline" style="width: 100%;">Create Account (Pending KGC)</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW 2: LOGGED-IN DATA OWNER DASHBOARD -->
+      <div id="dashboard-view" style="display: none;">
+        
+        <!-- Header Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 id="dash-greeting" style="font-size: 24px; color: #f8fafc;">Welcome to Data Owner Suite</h2>
+            <div id="dash-kgc-badge" style="font-family: var(--font-mono); font-size: 12px; color: var(--emerald-glow);"></div>
+          </div>
+          <button onclick="handleLogout()" class="btn btn-outline" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Logout</button>
+        </div>
+
+        <!-- File Upload Card -->
+        <div class="cyber-card" style="margin-bottom: 30px;">
+          <div class="card-header">
+            <h3>&#128228; Secure File Upload & AES-128 Encryption</h3>
+            <span class="role-badge user">Cryptographic Storage</span>
+          </div>
+          <div class="card-body">
+            <form id="upload-form" onsubmit="handleUpload(event)">
+              <div class="form-group">
+                <label for="upload-fname">Document Title / File Name</label>
+                <input type="text" id="upload-fname" class="form-control" placeholder="Cloud Security Whitepaper" required>
+              </div>
+              <div class="form-group">
+                <label for="upload-data">Plaintext Data Content</label>
+                <textarea id="upload-data" class="form-control" rows="3" placeholder="Type document text or paste sample records..." required></textarea>
+              </div>
+              <div style="margin-top: 16px;">
+                <button type="submit" class="btn btn-cyber" style="background: linear-gradient(135deg, var(--emerald-glow), #059669); color: #0b0f19;">
+                  &#128274; Encrypt with AES-128 & Upload to Cloud
+                </button>
+              </div>
+            </form>
+            <div id="upload-result-box" style="margin-top: 16px;"></div>
+          </div>
+        </div>
+
+        <!-- My Files & Audit Request Table -->
+        <div class="cyber-card">
+          <div class="card-header">
+            <h3>&#128196; My Cloud Files Repository</h3>
+            <button onclick="loadUserFiles()" class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;">&#8635; Refresh</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>File Key</th>
+                    <th>Document Name</th>
+                    <th>Cryptographic Hash</th>
+                    <th>Upload Time</th>
+                    <th>Audit Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="files-table-body">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No documents uploaded yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="cyber-footer">
+    <div class="app-container">
+      <p><strong>Department of Computer Science & Engineering</strong> &bull; R R Institute of Technology</p>
+    </div>
+  </footer>
+
+  <script>
+    let currentUser = null;
+    let pendingLoginEmail = null;
+
+    function showAlert(type, msg) {
+      const box = document.getElementById('alert-box');
+      box.innerHTML = `<div class="alert-banner ${type}" style="margin-bottom: 20px;">
+        <span>${type === 'success' ? '&#10004;' : '&#9888;'}</span>
+        <div>${msg}</div>
+      </div>`;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-pass').value.trim();
+
+      try {
+        const res = await fetch('/api/auth?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          pendingLoginEmail = email;
+          document.getElementById('otp-section').style.display = 'block';
+          document.getElementById('otp-hint-banner').innerHTML = `<span>&#128272;</span><div><strong>2FA OTP Generated:</strong> Use code <code style="color:var(--emerald-glow);font-size:16px;font-weight:700;">${data.otpDemoHint}</code> to verify your session.</div>`;
+          showAlert('info', '2FA OTP challenge dispatched! Enter the code below.');
+        } else {
+          showAlert('error', data.message);
+        }
+      } catch (err) {
+        showAlert('error', err.message);
+      }
+    }
+
+    async function handleOtpVerify(e) {
+      e.preventDefault();
+      const otp = document.getElementById('otp-code').value.trim();
+
+      try {
+        const res = await fetch('/api/auth?action=otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: pendingLoginEmail, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          document.getElementById('auth-view').style.display = 'none';
+          document.getElementById('dashboard-view').style.display = 'block';
+          document.getElementById('dash-greeting').innerText = `Welcome, ${currentUser.name} (${currentUser.email})`;
+          document.getElementById('dash-kgc-badge').innerText = `KGC Private Key Bound: ${currentUser.kgc}`;
+          showAlert('success', 'Authentication verified! Data Owner Dashboard active.');
+          loadUserFiles();
+        } else {
+          showAlert('error', data.message);
+        }
+      } catch (err) {
+        showAlert('error', err.message);
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-pass').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+
+      try {
+        const res = await fetch('/api/auth?action=register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, phone, bio_sign: 'biometric-signature-token-sim' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('success', data.message);
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-pass').value = password;
+        } else {
+          showAlert('error', data.message);
+        }
+      } catch (err) {
+        showAlert('error', err.message);
+      }
+    }
+
+    async function handleUpload(e) {
+      e.preventDefault();
+      const fname = document.getElementById('upload-fname').value.trim();
+      const data = document.getElementById('upload-data').value;
+
+      try {
+        const res = await fetch('/api/files', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fname, data, uid: currentUser.id })
+        });
+        const respData = await res.json();
+        if (respData.success) {
+          document.getElementById('upload-result-box').innerHTML = `
+            <div class="alert-banner success">
+              <span>&#10004;</span>
+              <div>
+                <strong>AES-128 Encryption Succeeded:</strong><br>
+                File Key: <code>${respData.fileKey}</code> | Hashcode: <code>${respData.hashCode}</code><br>
+                Ciphertext: <code style="word-break:break-all;">${respData.cipherTextPreview}</code>
+              </div>
+            </div>`;
+          document.getElementById('upload-fname').value = '';
+          document.getElementById('upload-data').value = '';
+          loadUserFiles();
+        } else {
+          showAlert('error', respData.message);
+        }
+      } catch (err) {
+        showAlert('error', err.message);
+      }
+    }
+
+    async function loadUserFiles() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`/api/files?uid=${currentUser.id}`);
+        const data = await res.json();
+        const tbody = document.getElementById('files-table-body');
+        if (data.success && data.files && data.files.length > 0) {
+          tbody.innerHTML = data.files.map(f => `
+            <tr>
+              <td><code style="color:var(--cyan-glow);">${f.filekey}</code></td>
+              <td>${f.fname}</td>
+              <td><code style="color:#fbbf24;">${f.hashcode}</code></td>
+              <td style="font-size:12px;color:var(--text-muted);">${f.time}</td>
+              <td><span class="role-badge ${f.audit_status === 'Audition Success' ? 'user' : 'tpa'}">${f.audit_status}</span></td>
+              <td>
+                <button onclick="requestAudit('${f.filekey}')" class="btn btn-cyber" style="font-size:11px;padding:4px 8px;background:linear-gradient(135deg,var(--amber-primary),#d97706);color:#0b0f19;">
+                  &#128269; Request Audit
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No documents uploaded yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function requestAudit(filekey) {
+      if (!currentUser) return;
+      try {
+        const res = await fetch('/api/audit?action=request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filekey, uid: currentUser.id })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('success', `Audit verification requested for file ${filekey}! TPA notified.`);
+          loadUserFiles();
+        } else {
+          showAlert('error', data.message);
+        }
+      } catch (err) {
+        showAlert('error', err.message);
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      document.getElementById('dashboard-view').style.display = 'none';
+      document.getElementById('auth-view').style.display = 'block';
+      document.getElementById('otp-section').style.display = 'none';
+      showAlert('info', 'Logged out successfully.');
+    }
+  </script>
+
+</body>
+</html>

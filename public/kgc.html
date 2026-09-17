@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KGC Key Generation Center | Fuzzy Auditing</title>
+  <link rel="stylesheet" href="css/cyber_theme.css">
+</head>
+<body>
+
+  <!-- Top Cyber Navbar -->
+  <nav class="cyber-navbar">
+    <div class="app-container nav-wrapper">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon" style="background: linear-gradient(135deg, var(--cyan-glow), #0284c7);">K</div>
+        <div class="brand-text">
+          <h1>KEY GENERATION CENTER (KGC)</h1>
+          <p>Identity Private Key Authority</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Overview</a></li>
+        <li><a href="/user">User Portal</a></li>
+        <li class="active"><a href="/kgc">KGC Portal</a></li>
+        <li><a href="/tpa">TPA Portal</a></li>
+        <li><a href="/cloud">Cloud Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="app-container hero-section">
+    <div style="max-width: 960px; margin: 20px auto;">
+
+      <!-- Alert Banner -->
+      <div id="kgc-alert"></div>
+
+      <!-- KGC Login Card -->
+      <div id="kgc-login-card" class="cyber-card" style="max-width: 440px; margin: 40px auto;">
+        <div class="card-header">
+          <h3>&#128272; KGC Administrator Authentication</h3>
+          <span class="role-badge kgc">KGC Authority</span>
+        </div>
+        <div class="card-body">
+          <form onsubmit="handleKgcLogin(event)">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="kgc-user" class="form-control" value="kgc" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="kgc-pass" class="form-control" value="kgc" required>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn btn-cyber" style="width: 100%; background: linear-gradient(135deg, var(--cyan-glow), #0284c7);">
+                Enter Key Generation Center &rarr;
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- KGC Dashboard -->
+      <div id="kgc-dashboard" style="display: none;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 24px; color: #f8fafc;">KGC Identity Management Dashboard</h2>
+            <p style="font-size: 13px; color: var(--text-secondary);">Authorize user identities and issue cryptographic private keys based on fuzzy biometrics.</p>
+          </div>
+          <button onclick="logoutKgc()" class="btn btn-outline" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Logout</button>
+        </div>
+
+        <div class="cyber-card">
+          <div class="card-header">
+            <h3>&#128101; Registered Users & Cryptographic Private Keys</h3>
+            <button onclick="loadKgcUsers()" class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;">&#8635; Refresh</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>KGC Private Key</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="kgc-users-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading user records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="cyber-footer">
+    <div class="app-container">
+      <p><strong>Department of Computer Science & Engineering</strong> &bull; R R Institute of Technology</p>
+    </div>
+  </footer>
+
+  <script>
+    function showKgcAlert(type, msg) {
+      document.getElementById('kgc-alert').innerHTML = `
+        <div class="alert-banner ${type}" style="margin-bottom: 20px;">
+          <span>${type === 'success' ? '&#10004;' : '&#9888;'}</span>
+          <div>${msg}</div>
+        </div>`;
+    }
+
+    function handleKgcLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('kgc-user').value.trim();
+      const p = document.getElementById('kgc-pass').value.trim();
+      if ((u === 'kgc' && p === 'kgc') || (u === 'admin' && p === 'admin')) {
+        document.getElementById('kgc-login-card').style.display = 'none';
+        document.getElementById('kgc-dashboard').style.display = 'block';
+        showKgcAlert('success', 'Authenticated as Key Generation Center Authority.');
+        loadKgcUsers();
+      } else {
+        showKgcAlert('error', 'Invalid KGC administrator credentials.');
+      }
+    }
+
+    async function loadKgcUsers() {
+      try {
+        const res = await fetch('/api/kgc');
+        const data = await res.json();
+        const tbody = document.getElementById('kgc-users-body');
+        if (data.success && data.users && data.users.length > 0) {
+          tbody.innerHTML = data.users.map(u => `
+            <tr>
+              <td>#${u.id}</td>
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td>${u.phone || 'N/A'}</td>
+              <td><span class="role-badge ${u.status === 'Activated' ? 'user' : 'tpa'}">${u.status}</span></td>
+              <td><code style="color:var(--cyan-glow);">${u.kgc || 'None'}</code></td>
+              <td>
+                ${u.kgc === 'Waiting' || !u.kgc ? `
+                  <button onclick="approveKey(${u.id})" class="btn btn-cyber" style="font-size:11px;padding:4px 8px;background:linear-gradient(135deg,var(--cyan-glow),#0284c7);color:#0b0f19;">
+                    &#9989; Generate & Send Key
+                  </button>
+                ` : `
+                  <span style="color:var(--emerald-glow);font-size:12px;">&#10004; Key Active</span>
+                `}
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No users found.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function approveKey(userId) {
+      try {
+        const res = await fetch('/api/kgc?action=approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showKgcAlert('success', `Private Key [${data.issuedKey}] issued for User #${userId}! Identity authorized.`);
+          loadKgcUsers();
+        } else {
+          showKgcAlert('error', data.message);
+        }
+      } catch (err) {
+        showKgcAlert('error', err.message);
+      }
+    }
+
+    function logoutKgc() {
+      document.getElementById('kgc-dashboard').style.display = 'none';
+      document.getElementById('kgc-login-card').style.display = 'block';
+      showKgcAlert('info', 'Logged out of KGC.');
+    }
+  </script>
+
+</body>
+</html>
