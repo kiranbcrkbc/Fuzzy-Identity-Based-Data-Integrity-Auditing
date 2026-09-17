@@ -1,0 +1,50 @@
+# ==============================================================================
+# .gitignore - Fuzzy Identity-Based Data Integrity Auditing System
+# ==============================================================================
+
+# Compiled Java Bytecode & Archives
+*.class
+*.war
+*.ear
+**/build/
+**/dist/
+**/WEB-INF/classes/
+
+# NetBeans / IDE Project Artifacts
+**/nbproject/private/
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Operating System Junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# Server Logs & Temporary Directories
+*.log
+**/logs/
+**/temp/
+**/work/
+
+# Heavy Runtimes & Portable Binaries (Recreated via tools/setup_runtime.ps1 or Docker)
+**/tools/apache-tomcat*
+**/tools/jdk*
+**/tools/*.zip
+
+# Temporary Test Scratch Files
+**/tools/test_sign.png
+**/tools/test_file.txt
+**/tools/live_test_doc.txt
+**/tools/special_test_file.txt
+**/tools/TestDB.class
+
+# Secrets & Environment Credentials
+.env
+*.env.local
+*.pem
+*.key
+*.cert
