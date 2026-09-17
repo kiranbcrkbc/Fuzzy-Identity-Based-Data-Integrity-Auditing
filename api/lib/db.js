@@ -27,6 +27,33 @@ let memoryStore = {
   audit_proof: []
 };
 
+const DB_FILE = path.join(process.env.TEMP || '/tmp', 'fuzzy_db.json');
+
+function loadStore() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const data = fs.readFileSync(DB_FILE, 'utf8');
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (parsed.users) memoryStore.users = parsed.users;
+        if (parsed.fileupload) memoryStore.fileupload = parsed.fileupload;
+        if (parsed.audit_request) memoryStore.audit_request = parsed.audit_request;
+        if (parsed.cloud_request) memoryStore.cloud_request = parsed.cloud_request;
+        if (parsed.audit_proof) memoryStore.audit_proof = parsed.audit_proof;
+      }
+    }
+  } catch (e) {}
+}
+
+function saveStore() {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(memoryStore, null, 2));
+  } catch (e) {}
+}
+
+// Initial load
+loadStore();
+
 // Check if MySQL connection is configured
 const hasMySQL = Boolean(process.env.DB_HOST || process.env.MYSQL_URL || process.env.DATABASE_URL);
 let pool = null;
@@ -61,8 +88,18 @@ async function query(sql, params = []) {
 }
 
 function memoryQuery(sql, params = []) {
+  loadStore();
   const normalized = sql.trim();
   const lower = normalized.toLowerCase();
+  const isMutation = lower.startsWith('insert into') || lower.includes('update ') || lower.startsWith('delete from');
+  const res = executeMemoryQuery(lower, params);
+  if (isMutation) {
+    saveStore();
+  }
+  return res;
+}
+
+function executeMemoryQuery(lower, params = []) {
 
   // 1. SELECT COUNT(*) FROM user WHERE email = ?
   if (lower.startsWith('select count(*) from user') || lower.startsWith('select count(*) as count from user')) {
@@ -273,7 +310,24 @@ function memoryQuery(sql, params = []) {
   return [];
 }
 
+async function parseBody(req) {
+  if (req.body) {
+    if (typeof req.body === 'string') {
+      try { return JSON.parse(req.body); } catch(e) { return {}; }
+    }
+    return req.body;
+  }
+  if (req.method === 'POST' || req.method === 'PUT') {
+    let raw = '';
+    req.on('data', chunk => { raw += chunk.toString(); });
+    await new Promise(resolve => req.on('end', resolve));
+    try { return JSON.parse(raw); } catch(e) { return {}; }
+  }
+  return {};
+}
+
 module.exports = {
   query,
-  memoryStore
+  memoryStore,
+  parseBody
 };

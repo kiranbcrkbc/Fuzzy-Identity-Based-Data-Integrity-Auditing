@@ -3,8 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const PORT = process.env.PORT || 3000;
-
 const authHandler = require('./api/auth');
 const kgcHandler = require('./api/kgc');
 const filesHandler = require('./api/files');
@@ -24,33 +22,46 @@ const mimeTypes = {
   '.svg': 'image/svg+xml'
 };
 
-const server = http.createServer(async (req, res) => {
+async function handler(req, res) {
   const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
+  let pathname = parsedUrl.pathname;
 
-  // Augment res with standard Express/Vercel helpers (status, json)
-  res.status = function(statusCode) {
-    this.statusCode = statusCode;
-    return this;
-  };
-  res.json = function(data) {
-    this.setHeader('Content-Type', 'application/json');
-    this.end(JSON.stringify(data));
-    return this;
-  };
-
-  req.query = parsedUrl.query;
-
-  // Handle JSON body for POST requests
-  if (req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk.toString(); });
-    await new Promise(resolve => req.on('end', resolve));
-    try {
-      req.body = body ? JSON.parse(body) : {};
-    } catch (e) {
-      req.body = {};
+  // If Vercel or proxy rewrote the URL to /index or /index.js, recover original URL
+  if (pathname === '/index.js' || pathname === '/index') {
+    const orig = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'] || req.headers['x-now-route-matches'];
+    if (orig) {
+      const parsedOrig = url.parse(orig, true);
+      pathname = parsedOrig.pathname;
+      req.query = Object.assign({}, parsedOrig.query, parsedUrl.query, req.query);
     }
+  }
+
+  // Augment res with standard Express/Vercel helpers
+  if (!res.status) {
+    res.status = function(statusCode) {
+      this.statusCode = statusCode;
+      return this;
+    };
+  }
+  if (!res.json) {
+    res.json = function(data) {
+      this.setHeader('Content-Type', 'application/json');
+      this.end(JSON.stringify(data));
+      return this;
+    };
+  }
+
+  req.query = req.query || parsedUrl.query || {};
+
+  // Diagnostic Ping
+  if (pathname === '/api/ping') {
+    return res.status(200).json({
+      status: 'ok',
+      time: new Date().toISOString(),
+      resolvedPath: pathname,
+      reqUrl: req.url,
+      xMatchedPath: req.headers['x-matched-path']
+    });
   }
 
   // 1. API Route Dispatching
@@ -81,7 +92,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': contentType });
     fs.createReadStream(filePath).pipe(res);
   } else {
-    // Fallback to index.html for client-side routing
+    // Fallback to index.html
     const indexPath = path.join(__dirname, 'public', 'index.html');
     if (fs.existsSync(indexPath)) {
       res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -91,8 +102,15 @@ const server = http.createServer(async (req, res) => {
       res.end('404 Not Found');
     }
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Vercel Full-Stack Application running at: http://localhost:${PORT}`);
-});
+// Local Execution
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  const server = http.createServer(handler);
+  server.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = handler;

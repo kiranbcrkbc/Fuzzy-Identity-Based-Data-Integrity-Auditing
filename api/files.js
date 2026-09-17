@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
 
     // 2. POST: Upload new file
     if (req.method === 'POST') {
+      req.body = await db.parseBody(req);
       const { fname, data, uid } = req.body || {};
 
       if (!fname || !data || !uid) {

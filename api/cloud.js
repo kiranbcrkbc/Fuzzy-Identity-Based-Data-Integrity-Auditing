@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  req.body = await db.parseBody(req);
   const action = req.query.action || (req.body && req.body.action);
 
   try {

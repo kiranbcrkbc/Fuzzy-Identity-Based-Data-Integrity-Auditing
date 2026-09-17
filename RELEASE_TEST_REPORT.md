@@ -19,7 +19,8 @@
 | **Negative Security & Tampering Tests** | 7 | 7 | 0 | **PASS** |
 | **Live Public HTTPS End-to-End Test** | 7 | 7 | 0 | **PASS** |
 | **Vercel Full-Stack Pipeline & Security** | 20 | 20 | 0 | **PASS** |
-| **TOTAL** | **84** | **84** | **0** | **PASS (100%)** |
+| **Live Public Vercel Production Deployment** | 22 | 22 | 0 | **PASS** |
+| **TOTAL** | **106** | **106** | **0** | **PASS (100%)** |
 
 ---
 
@@ -149,6 +150,36 @@
 | F18 | Cloud Proof Computation | `POST /api/cloud?action=proof` | Deterministic proof computed and persisted | **PASS** |
 | F19 | Positive Proof Verification | `POST /api/tpa?action=verify` | TPA confirms proof matches original hash (100% Match) | **PASS** |
 | F20 | Deliberate Tampering Detection | `POST /api/tamper?action=corrupt` | TPA detects hash corruption & flags INTEGRITY BREACH | **PASS** |
+
+---
+
+### Category G: Live Public Vercel Production Deployment (`test_live_vercel_deployment.ps1`)
+**Target Production URL:** `https://fuzzy-identity-auditing.vercel.app`
+
+| # | Test Name | Endpoint / Operation | Verification Asserted | Result |
+| :-: | :--- | :--- | :--- | :-: |
+| G1 | Homepage Route Availability | `GET /` | HTTP 200 OK & Cyber Theme render | **PASS** |
+| G2 | User Portal Route Availability | `GET /user` | HTTP 200 OK & Data Owner Portal active | **PASS** |
+| G3 | KGC Portal Route Availability | `GET /kgc` | HTTP 200 OK & Key Center active | **PASS** |
+| G4 | TPA Portal Route Availability | `GET /tpa` | HTTP 200 OK & Auditor Suite active | **PASS** |
+| G5 | Cloud Portal Route Availability| `GET /cloud` | HTTP 200 OK & Storage Server active | **PASS** |
+| G6 | User Registration | `POST /api/auth?action=register` | Biometric identity record persisted | **PASS** |
+| G7 | Duplicate Email Rejection | `POST /api/auth?action=register` | HTTP 409 Conflict returned | **PASS** |
+| G8 | Pre-KGC Login Block | `POST /api/auth?action=login` | Blocked: Pending KGC Approval (403) | **PASS** |
+| G9 | KGC Identity Discovery | `GET /api/kgc?action=list` | User discovered in KGC registry | **PASS** |
+| G10 | KGC Secret Key Issuance | `POST /api/kgc?action=approve` | Key `FUZZY...` generated and bound | **PASS** |
+| G11 | User Authentication | `POST /api/auth?action=login` | Valid credentials, dynamic OTP issued | **PASS** |
+| G12 | Bad OTP Rejection | `POST /api/auth?action=otp` | Invalid OTP rejected (401) | **PASS** |
+| G13 | Valid 2FA OTP Verification | `POST /api/auth?action=otp` | Correct OTP verified, session active | **PASS** |
+| G14 | AES-128 Document Upload | `POST /api/files` | File encrypted & hash persisted | **PASS** |
+| G15 | Audit Request Initiation | `POST /api/audit?action=request` | Audit challenge dispatched to TPA | **PASS** |
+| G16 | TPA Challenge to Cloud | `POST /api/tpa?action=challenge` | Challenge forwarded to Cloud Storage | **PASS** |
+| G17 | Cloud Proof Computation | `POST /api/cloud?action=proof` | Deterministic proof computed | **PASS** |
+| G18 | Positive Proof Verification | `POST /api/tpa?action=verify` | TPA confirms proof matches 100% | **PASS** |
+| G19 | Deliberate Tampering Injection | `POST /api/tamper?action=corrupt` | Storage hash deliberately corrupted | **PASS** |
+| G20 | Tampering Detection | `POST /api/tpa?action=verify` | TPA detects INTEGRITY BREACH | **PASS** |
+| G21 | Clean State Restoration | `POST /api/tamper?action=restore` | Storage hash restored to clean state | **PASS** |
+| G22 | Restored Integrity Re-verify | `POST /api/tpa?action=verify` | TPA confirms clean state verified 100% | **PASS** |
 
 ---
 

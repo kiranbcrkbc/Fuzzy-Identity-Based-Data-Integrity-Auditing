@@ -1,0 +1,9 @@
+# Ignore large local runtimes from Vercel Serverless upload
+Fuzzy identity/tools/
+tools/
+**/apache-tomcat*
+**/jdk*
+**/build/
+**/dist/
+node_modules/
+.git/

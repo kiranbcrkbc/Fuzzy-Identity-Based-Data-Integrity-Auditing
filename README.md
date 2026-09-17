@@ -109,32 +109,34 @@ The application opens automatically at: **`http://localhost:8080/Fuzzy_IDbased_D
 
 ---
 
-## 6. Vercel Serverless Cloud Deployment (`.vercel.app`)
+## 6. Live Vercel Serverless Production Deployment (`.vercel.app`)
 
-The repository includes a modern, Vercel-native full-stack serverless architecture in the root directory:
-- **Serverless API Handlers (`api/`):** Node.js serverless functions handling authentication, AES-128 cryptographic operations, KGC private key generation, TPA auditing challenges, and deterministic cloud proof verification.
-- **Frontend Presentation Layer (`public/`):** Responsive Cyberpunk Glassmorphism UI for all 4 operational entities (`index.html`, `user.html`, `kgc.html`, `tpa.html`, `cloud.html`).
-- **Database Connectivity:** Supports managed MySQL databases via environment variables (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`), with an automated serverless persistent fallback engine when deployed directly without external DB configuration.
+The project is deployed and actively running on Vercel:
 
-### One-Click Vercel Deployment Instructions:
-1. Navigate to **[Vercel Dashboard &rarr; Add New Project](https://vercel.com/new)**.
-2. Select your connected GitHub account (**`kiranbcrkbc`**) and import repository:
-   **`kiranbcrkbc/Fuzzy-Identity-Based-Data-Integrity-Auditing`**
-3. Keep default settings (Framework: *Other*, Root Directory: `./`).
-4. *(Optional)* Add production MySQL credentials under **Environment Variables** (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`).
-5. Click **Deploy** &mdash; Vercel builds and deploys the live application in under 30 seconds to:
-   **`https://fuzzy-identity-based-data-integrity-auditing.vercel.app`**
+- **Live Production URL:** **`https://fuzzy-identity-auditing.vercel.app`**
+- **Permanent Deployment Link:** `https://fuzzy-identity-auditing-dhzr3v5dj-kiranbcrkbc.vercel.app`
+- **Architecture:** Node.js Serverless Microservices + Glassmorphism Cyberpunk Frontend
+- **Backend Handlers (`api/`):** Dynamic 2FA OTP, AES-128 Encryption, SHA deterministic hashing, KGC secret key issuance, TPA challenges, and cloud proof computation.
+- **Database Architecture:** Production-ready hybrid engine supporting managed MySQL via standard environment variables (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`) with automatic disk-backed fallback persistence.
 
-### Running the Vercel Application Locally:
+### Live Production Portal Links:
+- **Overview & Architecture:** [https://fuzzy-identity-auditing.vercel.app/](https://fuzzy-identity-auditing.vercel.app/)
+- **Data Owner Portal:** [https://fuzzy-identity-auditing.vercel.app/user](https://fuzzy-identity-auditing.vercel.app/user)
+- **KGC Key Authority:** [https://fuzzy-identity-auditing.vercel.app/kgc](https://fuzzy-identity-auditing.vercel.app/kgc)
+- **Third Party Auditor:** [https://fuzzy-identity-auditing.vercel.app/tpa](https://fuzzy-identity-auditing.vercel.app/tpa)
+- **Cloud Storage Server:** [https://fuzzy-identity-auditing.vercel.app/cloud](https://fuzzy-identity-auditing.vercel.app/cloud)
+
+### Running Live Production E2E Verification Tests (22 Stages):
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/test_live_vercel_deployment.ps1
+# Result: 22/22 Tests Passed (100% Success Rate against https://fuzzy-identity-auditing.vercel.app)
+```
+
+### Running Locally with Node.js:
 ```bash
 npm install
 npm start
-# Opens at: http://localhost:3000/
-```
-
-### Running Automated Vercel Pipeline Tests (20 Stages):
-```powershell
-powershell -File tools/test_vercel_full_pipeline.ps1
+# Launches on: http://localhost:3000/
 ```
 
 ---
